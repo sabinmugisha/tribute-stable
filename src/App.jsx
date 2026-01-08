@@ -16,19 +16,54 @@ import {
   ChevronLeft, 
   ChevronRight, 
   BookOpen,
-  Flame // Using Flame instead of Candle
+  Flame,
+  AlertCircle,
+  Shield,
+  History,
+  Mic,
+  Mic2,
+  Calendar,
+  MapPin,
+  Quote
 } from 'lucide-react';
 
 const slides = ["/tate1.jpg", "/tate2.jpg", "/tate3.jpg"];
 const galleryImages = ["/g1.jpg", "/g2.jpg", "/g3.jpg", "/g4.jpg", "/g5.jpg", "/g6.jpg"];
 
-// Timeline moments with timestamps
-const audioHighlights = [
-  { time: 30, title: "Childhood Memory", emoji: "👧" },
-  { time: 87, title: "First Job Story", emoji: "💼" },
-  { time: 145, title: "Wedding Day", emoji: "💍" },
-  { time: 210, title: "Motherhood", emoji: "👶" },
-  { time: 285, title: "Grandchildren", emoji: "👵" }
+// Voice stories with detailed metadata
+const voiceStories = [
+  {
+    id: 1,
+    title: "Hospital Story",
+    subtitle: "A Moment of Healing",
+    description: "In the quiet corridors of the hospital, she found strength not just for herself, but for everyone around her.",
+    audio: "/Hospital story.mp3",
+    duration: "3:45",
+    year: "1998",
+    location: "Kigali Central Hospital",
+    icon: <Heart className="text-rose-500" size={20} />,
+    color: "rose",
+    quotes: [
+      "Even in pain, she never stopped caring for others",
+      "Her resilience became a source of hope for the medical staff"
+    ]
+  },
+  {
+    id: 2,
+    title: "Genocide Against Tutsi",
+    subtitle: "The Danger of Jali",
+    description: "During the darkest days, she witnessed unimaginable courage and the extreme dangers faced by those who risked everything to protect others.",
+    audio: "/Genocide story.mp3",
+    duration: "4:20",
+    year: "1994",
+    location: "Jali, Rwanda",
+    icon: <Shield className="text-amber-500" size={20} />,
+    color: "amber",
+    quotes: [
+      "Jali was a place of both immense danger and incredible courage",
+      "She spoke of neighbors becoming protectors in the face of evil"
+    ]
+  }
 ];
 
 export default function App() {
@@ -36,10 +71,11 @@ export default function App() {
   const [index, setIndex] = useState(0);
   const [candles, setCandles] = useState(124);
   const [showGallery, setShowGallery] = useState(false);
+  const [activeVoice, setActiveVoice] = useState(1);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioTime, setAudioTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
-  const [currentHighlight, setCurrentHighlight] = useState(null);
+  const [currentVoice, setCurrentVoice] = useState(voiceStories[0]);
   const [showCandleEffect, setShowCandleEffect] = useState(false);
   const [candleMessages, setCandleMessages] = useState([
     "Sarah lit a candle • Just now",
@@ -51,35 +87,50 @@ export default function App() {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({ container: containerRef });
   const backgroundOpacity = useTransform(scrollYProgress, [0, 1], [0.3, 0.1]);
+
+  // Enhanced gate animations
+  const [gateProgress, setGateProgress] = useState(0);
   
-  // Enhanced slideshow with varied timing
+  useEffect(() => {
+    if (!hasEntered) {
+      const interval = setInterval(() => {
+        setGateProgress(prev => {
+          if (prev >= 100) return 0;
+          return prev + 0.5;
+        });
+      }, 50);
+      return () => clearInterval(interval);
+    }
+  }, [hasEntered]);
+
+  // Enhanced slideshow
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
-    }, 4500 + Math.random() * 2000); // Varied timing for organic feel
+    }, 4500 + Math.random() * 2000);
     return () => clearInterval(timer);
   }, []);
 
   // Audio player functionality
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.addEventListener('loadedmetadata', () => {
-        setAudioDuration(audioRef.current.duration);
-      });
-      
-      audioRef.current.addEventListener('timeupdate', () => {
-        setAudioTime(audioRef.current.currentTime);
-        
-        // Check for highlights
-        const highlight = audioHighlights.find(h => 
-          Math.abs(audioRef.current.currentTime - h.time) < 2
-        );
-        if (highlight && currentHighlight?.time !== highlight.time) {
-          setCurrentHighlight(highlight);
-          setTimeout(() => setCurrentHighlight(null), 3000);
-        }
-      });
-    }
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleMetadata = () => {
+      setAudioDuration(audio.duration);
+    };
+
+    const handleTimeUpdate = () => {
+      setAudioTime(audio.currentTime);
+    };
+
+    audio.addEventListener('loadedmetadata', handleMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+
+    return () => {
+      audio.removeEventListener('loadedmetadata', handleMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+    };
   }, []);
 
   const toggleAudio = () => {
@@ -91,10 +142,23 @@ export default function App() {
     setAudioPlaying(!audioPlaying);
   };
 
-  const jumpToHighlight = (time) => {
-    audioRef.current.currentTime = time;
-    audioRef.current.play();
-    setAudioPlaying(true);
+  const selectVoice = (voiceId) => {
+    setActiveVoice(voiceId);
+    const voice = voiceStories.find(v => v.id === voiceId);
+    setCurrentVoice(voice);
+    
+    // Reset audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setAudioPlaying(false);
+      setAudioTime(0);
+    }
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   const addCandle = () => {
@@ -118,106 +182,189 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-stone-200 font-sans overflow-x-hidden" ref={containerRef}>
       
-      {/* THE CINEMATIC ENTRANCE */}
+      {/* ENHANCED CINEMATIC ENTRANCE */}
       <AnimatePresence>
         {!hasEntered && (
           <motion.div 
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 1.5 } }}
+            exit={{ 
+              opacity: 0,
+              transition: { 
+                duration: 2,
+                ease: "easeInOut"
+              }
+            }}
             className="fixed inset-0 z-[100] flex items-center justify-center"
           >
-            {/* Animated background */}
+            {/* Animated gate background */}
             <motion.div 
               animate={{ 
-                backgroundPosition: ["0% 0%", "100% 100%"],
-                scale: [1, 1.1]
+                scale: [1, 1.02, 1],
+                opacity: [0.7, 0.9, 0.7]
               }}
               transition={{ 
-                duration: 20,
-                repeat: Infinity,
-                repeatType: "reverse"
+                duration: 8,
+                repeat: Infinity
               }}
               className="absolute inset-0 bg-gradient-to-br from-stone-900 via-black to-stone-800"
-              style={{ backgroundImage: `url('/gate.jpg')`, backgroundSize: 'cover' }}
+              style={{ 
+                backgroundImage: `url('/gate.jpg')`, 
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
             >
-              <div className="absolute inset-0 bg-black/70" />
+              <div className="absolute inset-0 bg-black/80" />
+              
+              {/* Animated gate bars */}
+              <div className="absolute inset-0 overflow-hidden">
+                {[...Array(8)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ y: '-100%' }}
+                    animate={{ y: gateProgress + '%' }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/20 to-transparent"
+                    style={{ top: `${(i + 1) * 12}%` }}
+                  />
+                ))}
+              </div>
             </motion.div>
             
-            {/* Central portal */}
+            {/* Central portal with enhanced interactivity */}
             <motion.div 
               animate={{ 
-                rotate: 360,
+                rotate: [0, 5, -5, 0],
                 scale: [1, 1.05, 1]
               }}
               transition={{ 
-                rotate: { duration: 60, repeat: Infinity, ease: "linear" },
+                rotate: { duration: 10, repeat: Infinity },
                 scale: { duration: 4, repeat: Infinity }
               }}
               className="relative z-10"
             >
               <motion.button 
                 onClick={() => setHasEntered(true)}
-                whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
+                whileHover={{ 
+                  scale: 1.1,
+                  transition: { duration: 0.2 }
+                }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative flex flex-col items-center gap-6"
+                className="group relative flex flex-col items-center gap-8"
               >
-                {/* Glowing ring */}
+                {/* Glowing rings */}
                 <motion.div 
                   animate={{ 
-                    boxShadow: [
-                      "0 0 20px rgba(255,255,255,0.1)",
-                      "0 0 40px rgba(255,255,255,0.3)",
-                      "0 0 20px rgba(255,255,255,0.1)"
-                    ]
+                    scale: [1, 1.2, 1],
+                    opacity: [0.3, 0.6, 0.3]
                   }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute w-32 h-32 rounded-full border border-white/30"
+                  transition={{ duration: 3, repeat: Infinity }}
+                  className="absolute w-40 h-40 rounded-full border-2 border-amber-500/30"
                 />
                 
-                <div className="w-24 h-24 rounded-full border-2 border-white/20 flex items-center justify-center backdrop-blur-xl bg-black/30 group-hover:bg-black/50 transition-all duration-500">
-                  <Unlock className="text-white" size={32} />
-                </div>
+                <motion.div 
+                  animate={{ 
+                    rotate: 360,
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{ 
+                    rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                    scale: { duration: 2, repeat: Infinity }
+                  }}
+                  className="relative"
+                >
+                  <div className="w-28 h-28 rounded-full border-2 border-white/20 flex items-center justify-center backdrop-blur-xl bg-black/40 group-hover:bg-black/60 transition-all duration-500">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Unlock className="text-amber-300" size={36} />
+                    </motion.div>
+                  </div>
+                  
+                  {/* Rotating particles around the lock */}
+                  {[...Array(8)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      animate={{
+                        rotate: 360,
+                        x: 56 * Math.cos((i * Math.PI) / 4),
+                        y: 56 * Math.sin((i * Math.PI) / 4)
+                      }}
+                      transition={{
+                        rotate: { duration: 15 + i, repeat: Infinity, ease: "linear" },
+                        x: { duration: 15 + i, repeat: Infinity, ease: "linear" },
+                        y: { duration: 15 + i, repeat: Infinity, ease: "linear" }
+                      }}
+                      className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full bg-amber-400/50"
+                    />
+                  ))}
+                </motion.div>
                 
-                <div className="text-center">
-                  <span className="block text-xs tracking-[0.5em] uppercase text-white/70 font-light mb-1">ENTER THE</span>
-                  <span className="block text-2xl font-serif italic text-white tracking-wider">Sanctuary</span>
+                <div className="text-center space-y-2">
+                  <span className="block text-xs tracking-[0.6em] uppercase text-white/60 font-light mb-2">
+                    Enter Memorial
+                  </span>
+                  <span className="block text-3xl font-serif italic text-white tracking-wider bg-gradient-to-r from-amber-200 to-amber-400 bg-clip-text text-transparent">
+                    Tate's Legacy
+                  </span>
                   <motion.div 
-                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    animate={{ opacity: [0.3, 1, 0.3] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="mt-4"
+                    className="mt-6"
                   >
-                    <ArrowRight className="mx-auto text-white/50" size={16} />
+                    <ArrowRight className="mx-auto text-amber-300/70" size={20} />
+                    <p className="text-[10px] uppercase tracking-widest text-white/40 mt-2">Click to Enter</p>
                   </motion.div>
                 </div>
               </motion.button>
             </motion.div>
             
-            {/* Floating particles */}
-            {[...Array(20)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ 
-                  x: Math.random() * 100 - 50 + 'vw',
-                  y: Math.random() * 100 - 50 + 'vh',
-                  opacity: 0
-                }}
-                animate={{ 
-                  y: [null, -100],
-                  opacity: [0, 1, 0]
-                }}
-                transition={{ 
-                  duration: 3 + Math.random() * 4,
-                  delay: i * 0.2,
-                  repeat: Infinity
-                }}
-                className="absolute w-[1px] h-[1px] bg-white/30 rounded-full"
+            {/* Floating historical elements */}
+            <div className="absolute inset-0 pointer-events-none">
+              {[...Array(12)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ 
+                    y: '100vh',
+                    x: Math.random() * 100 - 50 + 'vw',
+                    opacity: 0
+                  }}
+                  animate={{ 
+                    y: '-100vh',
+                    opacity: [0, 0.5, 0]
+                  }}
+                  transition={{ 
+                    duration: 15 + Math.random() * 10,
+                    delay: i * 1.5,
+                    repeat: Infinity,
+                    repeatDelay: Math.random() * 10
+                  }}
+                  className="absolute text-white/10"
+                  style={{
+                    fontSize: `${Math.random() * 24 + 12}px`,
+                    left: `${Math.random() * 100}%`
+                  }}
+                >
+                  {['♥', '✿', '✧', '✦', '❀', '✶'][i % 6]}
+                </motion.div>
+              ))}
+            </div>
+            
+            {/* Progress indicator */}
+            <motion.div 
+              className="absolute bottom-20 left-1/2 -translate-x-1/2 w-64 h-1 bg-white/10 rounded-full overflow-hidden"
+            >
+              <motion.div 
+                className="h-full bg-gradient-to-r from-amber-400 to-amber-600"
+                initial={{ width: '0%' }}
+                animate={{ width: gateProgress + '%' }}
               />
-            ))}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* DYNAMIC BACKGROUND WITH PARALLAX */}
+      {/* DYNAMIC BACKGROUND */}
       <div className="fixed inset-0 z-0">
         <motion.div 
           style={{ opacity: backgroundOpacity }}
@@ -246,171 +393,248 @@ export default function App() {
           </AnimatePresence>
         </motion.div>
         <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
-        
-        {/* Subtle floating particles */}
-        <div className="absolute inset-0">
-          {[...Array(15)].map((_, i) => (
-            <motion.div
-              key={i}
-              animate={{
-                y: [0, -100],
-                x: [0, Math.sin(i) * 50],
-                opacity: [0, 0.5, 0]
-              }}
-              transition={{
-                duration: 10 + i,
-                repeat: Infinity,
-                delay: i * 0.5
-              }}
-              className="absolute w-[2px] h-[2px] bg-white/10 rounded-full"
-              style={{
-                left: `${(i * 7) % 100}%`,
-                top: `${Math.random() * 100}%`
-              }}
-            />
-          ))}
-        </div>
       </div>
 
-      {/* MAIN CONTENT JOURNEY */}
+      {/* MAIN CONTENT */}
       <div className="relative z-10">
         
-        {/* SECTION I: THE VOICE & TIMELINE */}
+        {/* ENHANCED VOICE SECTION */}
         <section className="min-h-screen flex items-center justify-center px-4 md:px-8 py-20">
-          <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16 items-center">
-            
-            {/* Audio Player with Timeline */}
+          <div className="max-w-7xl w-full">
+            {/* Section Header */}
             <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.2 }}
-              className="lg:col-span-2 space-y-8"
+              initial={{ opacity: 0, y: -30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
+              className="text-center mb-16"
             >
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
+              <div className="inline-flex items-center gap-4 mb-6">
+                <div className="relative">
                   <motion.div
-                    animate={{ rotate: audioPlaying ? 360 : 0 }}
+                    animate={{ rotate: 360 }}
                     transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  >
-                    <Volume2 className="text-amber-500" size={28} />
-                  </motion.div>
-                  <h2 className="text-5xl lg:text-6xl font-serif italic text-white">
-                    Her Voice
-                  </h2>
+                    className="absolute -inset-4 rounded-full border-2 border-amber-500/20"
+                  />
+                  <Mic2 className="text-amber-400" size={32} />
                 </div>
-                <p className="text-stone-300/80 leading-relaxed text-lg max-w-2xl italic font-light">
-                  "To hear a voice is to feel a presence. These recordings are the echoes of her laughter and the wisdom she shared with us through the years."
-                </p>
+                <h2 className="text-5xl lg:text-7xl font-serif italic text-white">
+                  Her <span className="text-amber-300">Voice</span>
+                </h2>
               </div>
-              
-              {/* Enhanced Audio Player */}
-              <div className="bg-black/40 backdrop-blur-2xl p-8 rounded-3xl border border-white/10 shadow-2xl">
-                <audio 
-                  ref={audioRef} 
-                  src="/Conversation-With-Tate.mp3" 
-                  className="hidden"
-                />
+              <p className="text-stone-400 text-lg max-w-3xl mx-auto italic">
+                "The stories she carried were not just memories, but lessons of resilience, courage, and humanity. 
+                Listen to the echoes of her experiences."
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+              {/* Left Panel: Story Selector */}
+              <motion.div 
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="space-y-6"
+              >
+                <h3 className="text-2xl font-serif italic text-white flex items-center gap-3">
+                  <History size={24} /> Historical Accounts
+                </h3>
                 
-                <div className="space-y-6">
-                  {/* Progress & Highlights */}
-                  <div className="relative h-2 bg-white/10 rounded-full overflow-hidden">
-                    <motion.div 
-                      className="absolute h-full bg-gradient-to-r from-amber-500 to-orange-400"
-                      style={{ width: `${(audioTime / audioDuration) * 100 || 0}%` }}
-                    />
-                    
-                    {/* Highlight Markers */}
-                    {audioHighlights.map((highlight, i) => (
-                      <button
-                        key={i}
-                        onClick={() => jumpToHighlight(highlight.time)}
-                        className="absolute top-1/2 -translate-y-1/2 group"
-                        style={{ left: `${(highlight.time / audioDuration) * 100}%` }}
-                      >
-                        <div className="relative">
-                          <div className="w-3 h-3 rounded-full bg-white/20 group-hover:bg-amber-400 transition-colors" />
-                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-xs bg-black/80 px-2 py-1 rounded">
-                            {highlight.emoji} {highlight.title}
-                          </div>
+                {voiceStories.map((story) => (
+                  <motion.button
+                    key={story.id}
+                    onClick={() => selectVoice(story.id)}
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`w-full p-6 rounded-2xl text-left transition-all duration-300 ${
+                      activeVoice === story.id
+                        ? `bg-gradient-to-r from-${story.color}-500/20 to-${story.color}-600/10 border-2 border-${story.color}-500/30`
+                        : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className={`p-3 rounded-xl bg-${story.color}-500/10`}>
+                        {story.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-xl font-serif italic text-white">
+                            {story.title}
+                          </h4>
+                          <span className={`text-xs px-2 py-1 rounded-full bg-${story.color}-500/20 text-${story.color}-300`}>
+                            {story.duration}
+                          </span>
                         </div>
-                      </button>
-                    ))}
-                  </div>
-                  
-                  {/* Controls */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={toggleAudio}
-                        className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg"
-                      >
-                        {audioPlaying ? <Pause size={24} /> : <Play size={24} />}
-                      </motion.button>
-                      <div className="text-sm text-stone-400">
-                        {Math.floor(audioTime / 60)}:{Math.floor(audioTime % 60).toString().padStart(2, '0')}
-                        <span className="mx-2">/</span>
-                        {Math.floor(audioDuration / 60)}:{Math.floor(audioDuration % 60).toString().padStart(2, '0')}
+                        <p className="text-stone-400 text-sm mb-3">
+                          {story.description}
+                        </p>
+                        <div className="flex items-center gap-4 text-xs text-stone-500">
+                          <span className="flex items-center gap-1">
+                            <Calendar size={12} /> {story.year}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MapPin size={12} /> {story.location}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.button>
+                ))}
+                
+                {/* Context Panel */}
+                <div className="mt-8 p-6 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10">
+                  <h4 className="text-lg font-serif italic text-white mb-4 flex items-center gap-2">
+                    <Quote size={20} /> Context
+                  </h4>
+                  <p className="text-stone-400 text-sm leading-relaxed">
+                    These recordings preserve critical moments in both personal and national history. 
+                    They serve as a bridge between generations, carrying forward the wisdom of lived experience.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Center Panel: Enhanced Audio Player */}
+              <motion.div 
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.4 }}
+                className="lg:col-span-2"
+              >
+                <div className={`bg-gradient-to-br from-${currentVoice.color}-500/5 via-black/40 to-${currentVoice.color}-600/5 backdrop-blur-3xl rounded-3xl border-2 border-${currentVoice.color}-500/20 p-8 shadow-2xl`}>
+                  {/* Current Story Header */}
+                  <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-3xl font-serif italic text-white">
+                          {currentVoice.title}
+                        </h3>
+                        <p className="text-stone-400 mt-1">{currentVoice.subtitle}</p>
+                      </div>
+                      <div className={`px-4 py-2 rounded-full bg-${currentVoice.color}-500/20 text-${currentVoice.color}-300 text-sm flex items-center gap-2`}>
+                        <AlertCircle size={16} /> Historical Recording
                       </div>
                     </div>
                     
-                    {/* Current Highlight Display */}
-                    <AnimatePresence>
-                      {currentHighlight && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="bg-black/50 px-4 py-2 rounded-full border border-amber-500/30 flex items-center gap-2"
-                        >
-                          <Clock size={14} />
-                          <span className="text-sm">{currentHighlight.emoji} {currentHighlight.title}</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                  
-                  {/* Highlights List */}
-                  <div className="pt-4 border-t border-white/10">
-                    <h4 className="text-sm uppercase tracking-wider text-stone-400 mb-3 flex items-center gap-2">
-                      <Sparkles size={14} /> Timeline Moments
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {audioHighlights.map((highlight, i) => (
-                        <button
-                          key={i}
-                          onClick={() => jumpToHighlight(highlight.time)}
-                          className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm flex items-center gap-2"
-                        >
-                          <span>{highlight.emoji}</span>
-                          <span>{highlight.title}</span>
-                        </button>
-                      ))}
+                    {/* Timeline Bar */}
+                    <div className="relative h-3 bg-white/10 rounded-full overflow-hidden mb-4">
+                      <motion.div 
+                        className={`absolute h-full bg-gradient-to-r from-${currentVoice.color}-500 to-${currentVoice.color}-600`}
+                        style={{ width: `${(audioTime / audioDuration) * 100 || 0}%` }}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm text-stone-400">
+                      <span>{formatTime(audioTime)}</span>
+                      <span>{formatTime(audioDuration)}</span>
                     </div>
                   </div>
+                  
+                  {/* Audio Controls */}
+                  <div className="flex items-center justify-center gap-8 mb-8">
+                    <audio 
+                      ref={audioRef} 
+                      src={currentVoice.audio}
+                      className="hidden"
+                      onEnded={() => setAudioPlaying(false)}
+                    />
+                    
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={toggleAudio}
+                      className={`w-20 h-20 rounded-full bg-gradient-to-br from-${currentVoice.color}-500 to-${currentVoice.color}-600 flex items-center justify-center shadow-2xl relative`}
+                    >
+                      {/* Glowing effect */}
+                      <motion.div
+                        animate={{
+                          scale: [1, 1.2, 1],
+                          opacity: [0.5, 0.8, 0.5]
+                        }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="absolute inset-0 rounded-full blur-xl bg-current"
+                      />
+                      
+                      {audioPlaying ? (
+                        <Pause className="text-white" size={28} />
+                      ) : (
+                        <Play className="text-white ml-1" size={28} />
+                      )}
+                    </motion.button>
+                    
+                    <div className="flex-1 max-w-md">
+                      <p className="text-stone-300 italic mb-4">
+                        {activeVoice === 2 
+                          ? "Speaking about the extreme dangers faced in Jali during the Genocide Against Tutsi"
+                          : "Reflecting on moments of healing and humanity in difficult times"
+                        }
+                      </p>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                          Recorded: {currentVoice.year}
+                        </span>
+                        <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                          Location: {currentVoice.location}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Key Quotes */}
+                  <div className="border-t border-white/10 pt-8">
+                    <h4 className="text-xl font-serif italic text-white mb-6 flex items-center gap-3">
+                      <Quote className={`text-${currentVoice.color}-400`} /> Key Insights
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {currentVoice.quotes.map((quote, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.1 }}
+                          className={`p-4 rounded-xl bg-${currentVoice.color}-500/10 border border-${currentVoice.color}-500/20`}
+                        >
+                          <p className="text-stone-200 italic">"{quote}"</p>
+                        </motion.div>
+                      ))}
+                    </div>
+                    
+                    {/* Special Context for Genocide Story */}
+                    {activeVoice === 2 && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="mt-6 p-4 rounded-xl bg-amber-900/20 border border-amber-700/30"
+                      >
+                        <div className="flex items-start gap-3">
+                          <Shield className="text-amber-400 mt-1" size={20} />
+                          <div>
+                            <h5 className="text-amber-300 font-medium mb-2">
+                              Historical Context: Jali During Genocide
+                            </h5>
+                            <p className="text-stone-300 text-sm">
+                              Jali was one of the most dangerous areas during the Genocide Against Tutsi. 
+                              Despite immense risks, some individuals showed extraordinary courage, 
+                              demonstrating humanity in the face of unimaginable darkness.
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-            
-            {/* Side Quote */}
-            <motion.div 
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.4 }}
-              className="relative"
-            >
-              <div className="absolute -left-4 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-amber-500/30 to-transparent" />
-              <blockquote className="pl-8 py-8">
-                <div className="text-6xl font-serif text-amber-500/20 mb-4">"</div>
-                <p className="text-stone-300/70 italic leading-relaxed text-lg mb-6">
-                  Her words were not just sounds, but seeds planted in the hearts of those who listened. Each recording is a treasure, a moment preserved in time.
-                </p>
-                <div className="text-xs uppercase tracking-wider text-stone-500">
-                  Family Memory
+                
+                {/* Decorative Elements */}
+                <div className="flex justify-center mt-8 gap-4">
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      animate={{ y: [0, -10, 0] }}
+                      transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }}
+                      className={`w-2 h-2 rounded-full bg-${currentVoice.color}-400`}
+                    />
+                  ))}
                 </div>
-              </blockquote>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
         </section>
 
