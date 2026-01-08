@@ -29,7 +29,7 @@ const galleryMedia = [
 
 const voiceStories = [
   { id: 1, title: "Healing & Compassion", quote: "She taught us that the greatest medicine is a compassionate heart and a listening ear.", audio: "/Hospital story.mp3", year: "A Legacy", location: "Kigali" },
-  { id: 2, title: "Strength & Protection", quote: "In times of darkness, she was our shield, showing us that love is the strongest force on earth.", audio: "/Genocide story.mp3", year: "A Testament", location: "Jali" }
+  { id: 2, title: "Strength & Protection", quote: "In times of darkness, During Genocide against Tutsi.", audio: "/Genocide story.mp3", year: "A Testament", location: "Jali" }
 ];
 
 export default function TateMemorial() {
