@@ -123,7 +123,7 @@ export default function TateMemorial() {
             className="absolute bottom-[-10vh] left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
           >
             <div className="w-[1px] h-16 bg-gradient-to-b from-amber-500/30 to-transparent" />
-            <span className="text-[8px] uppercase tracking-[0.4em] text-stone-600 font-bold">Scroll Down</span>
+            
           </motion.div>
         </div>
       </section>
