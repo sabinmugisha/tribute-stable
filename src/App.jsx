@@ -9,11 +9,12 @@ import {
 const galleryMedia = [
   { id: 1, url: '/1.jpeg', title: 'The Matriarch', description: 'The steady hand that guided us and the heart that held us all together.' },
   { id: 2, url: '/2.jpeg', title: 'Generations of Love', description: 'Watching her legacy grow through the eyes of her children and grandchildren.' },
-  { id: 3, url: '/3.jpeg', title: 'The Sound of Laughter', description: 'A joy so infectious it became the background music of our childhood.' },
-  { id: 4, url: '/4.jpeg', title: 'A Lifetime of Grace', description: 'Teaching us that strength is found in kindness and resilience in faith.' },
   { id: 5, url: '/5.jpeg', title: 'Roots & Wings', description: 'She gave us the roots to know where we belong and the wings to fly.' },
-  { id: 6, url: '/6.jpeg', title: 'The Heart of Kigali', description: 'Walking through history with a face that reflects the spirit of a nation.' },
+  { id: 3, url: '/3.jpeg', title: 'The Sound of Laughter', description: 'A joy so infectious it became the background music of our childhood.' },
   { id: 7, url: '/7.jpeg', title: 'Family Traditions', description: 'Sharing joy and wisdom with the ones who matter most around her table.' },
+  { id: 15, url: '/15.jpeg', title: 'Peace & Nature', description: 'Finding beauty in the simple things, a lesson she taught us all.' },
+  { id: 4, url: '/4.jpeg', title: 'A Lifetime of Grace', description: 'Teaching us that strength is found in kindness and resilience in faith.' },
+  { id: 6, url: '/6.jpeg', title: 'The Heart of Kigali', description: 'Walking through history with a face that reflects the spirit of a nation.' },
   { id: 8, url: '/8.jpeg', title: 'Quiet Wisdom', description: 'Her words were few, but her example spoke volumes to every generation.' },
   { id: 9, url: '/9.jpeg', title: 'Unbreakable Bonds', description: 'The strength of family is the greatest treasure she left behind.' },
   { id: 10, url: '/10.jpeg', title: 'A Timeless Spirit', description: 'A legacy of love that transcends years and reaches into the future.' },
@@ -21,7 +22,6 @@ const galleryMedia = [
   { id: 12, url: '/12.jpeg', title: 'Snapshots of Joy', description: 'Every memory of her is a gift that we carry in our hearts daily.' },
   { id: 13, url: '/13.jpeg', title: 'Our Path Forward', description: 'A journey marked by love, resilience, and an unwavering devotion to family.' },
   { id: 14, url: '/14.jpeg', title: 'The Face of Home', description: 'To look at her was to know you were safe, loved, and always welcome.' },
-  { id: 15, url: '/15.jpeg', title: 'Peace & Nature', description: 'Finding beauty in the simple things, a lesson she taught us all.' },
   { id: 16, url: '/16.jpeg', title: 'Her Eternal Light', description: 'The smile that brightened our darkest days continues to guide us.' },
   { id: 17, url: '/17.jpeg', title: 'Mother of Courage', description: 'Showing us how to stand tall with dignity in the face of any storm.' },
   { id: 18, url: '/18.jpeg', title: 'Our Eternal Hope', description: 'A beacon of hope that will shine through her grandchildren forever.' },
@@ -37,7 +37,7 @@ export default function TateMemorial() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedIdx, setSelectedIdx] = useState(null);
-  const [displayLimit, setDisplayLimit] = useState(8); 
+  const [displayLimit, setDisplayLimit] = useState(6); 
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -69,11 +69,70 @@ export default function TateMemorial() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-stone-200 selection:bg-amber-500/20 select-none overflow-x-hidden font-sans">
       
+      {/* --- REFINED HERO SECTION --- */}
+      <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-black/30 to-black/60 z-10" />
+          <motion.div 
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.4 }}
+            transition={{ duration: 3.5, ease: "easeOut" }}
+            className="w-full h-full"
+          >
+            <img 
+              src="/99.jpeg" 
+              alt="Mukagemusi Anastasie Portrait"
+              className="w-full h-full object-cover object-center grayscale pointer-events-none"
+            />
+          </motion.div>
+        </div>
+
+        <div className="relative z-20 text-center px-6 w-full max-w-6xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+          >
+            <span className="text-amber-500/40 uppercase tracking-[0.7em] text-[10px] md:text-xs mb-6 block font-light">
+              In Loving Memory
+            </span>
+            
+            {/* Horizontal Medium Typography */}
+            <h1 className="text-4xl md:text-7xl font-serif italic text-white mb-8 tracking-tighter leading-tight whitespace-nowrap">
+              Mukagemusi Anastasie
+            </h1>
+
+            <div className="flex items-center justify-center gap-6 mb-8">
+              <div className="h-[0.5px] w-10 md:w-20 bg-amber-500/30" />
+              <span className="text-stone-300 font-light tracking-[0.4em] text-xs md:text-lg">
+                1941 — 2026
+              </span>
+              <div className="h-[0.5px] w-10 md:w-20 bg-amber-500/30" />
+            </div>
+            
+            <p className="max-w-xl mx-auto text-stone-400 font-light italic leading-relaxed text-sm md:text-base opacity-70">
+              "Her light will never truly fade. It lives on in every life she touched, in every memory we hold,
+               and in the love she planted in our hearts. She may be gone from this world, but her spirit will forever guide us."
+            </p>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2.2, duration: 1 }}
+            className="absolute bottom-[-10vh] left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+          >
+            <div className="w-[1px] h-16 bg-gradient-to-b from-amber-500/30 to-transparent" />
+            <span className="text-[8px] uppercase tracking-[0.4em] text-stone-600 font-bold">Scroll Down</span>
+          </motion.div>
+        </div>
+      </section>
+
       {/* SECTION 1: VOICE ARCHIVES */}
       <section id="voices" className="max-w-6xl mx-auto py-32 px-6">
         <div className="flex flex-col items-center mb-16 text-center">
           <Mic2 className="text-amber-500/40 mb-4" size={32} />
-          <h2 className="text-4xl font-serif italic text-white tracking-wide">Wisdom Passed Down</h2>
+          <h2 className="text-3xl font-serif italic text-white tracking-wide">Wisdom Passed Down</h2>
           <div className="w-12 h-[1px] bg-amber-500/30 mt-4" />
         </div>
         
@@ -98,16 +157,16 @@ export default function TateMemorial() {
             <div className="relative z-10">
               <p className="text-2xl md:text-3xl font-serif italic leading-relaxed text-stone-200 mb-12">"{activeVoice.quote}"</p>
               <div className="flex items-center gap-8">
-                <button onClick={toggleAudio} className="w-20 h-20 rounded-full bg-amber-500 text-black flex items-center justify-center shadow-2xl hover:scale-105 transition-transform">
-                  {isPlaying ? <Pause size={28} fill="black" /> : <Play size={28} fill="black" className="ml-1" />}
+                <button onClick={toggleAudio} className="w-16 h-16 rounded-full bg-amber-500 text-black flex items-center justify-center shadow-2xl hover:scale-105 transition-transform">
+                  {isPlaying ? <Pause size={24} fill="black" /> : <Play size={24} fill="black" className="ml-1" />}
                 </button>
                 <div className="flex-1 space-y-3">
                   <div className="h-[2px] bg-stone-800 rounded-full overflow-hidden">
                     <motion.div className="h-full bg-amber-500" animate={{ width: `${progress}%` }} />
                   </div>
-                  <div className="flex justify-between text-[10px] text-stone-500 tracking-[0.3em] uppercase">
+                  <div className="flex justify-between text-[10px] text-stone-500 tracking-[0.3em] uppercase font-light">
                     <span>Legacy Record</span>
-                    <span className="text-amber-500/60 tracking-normal italic font-serif text-xs capitalize">Grandmother's Voice</span>
+                    <span>Grandmother's Voice</span>
                   </div>
                 </div>
               </div>
@@ -123,13 +182,10 @@ export default function TateMemorial() {
         <div className="max-w-5xl mx-auto px-6 relative z-10">
           <div className="flex flex-col items-center mb-16 text-center">
             <Film className="text-amber-500/40 mb-4" size={32} />
-            <h2 className="text-4xl font-serif italic text-white tracking-wide">A Journey in Motion</h2>
-            <p className="text-stone-500 text-xs uppercase tracking-[0.4em] mt-4 font-light">Celebrating her beautiful legacy</p>
+            <h2 className="text-3xl font-serif italic text-white tracking-wide">A Journey in Motion</h2>
           </div>
-          
           <div className="relative p-2 rounded-[3rem] bg-gradient-to-b from-white/10 to-transparent shadow-2xl">
             <div className="aspect-video rounded-[2.5rem] overflow-hidden bg-black relative group shadow-2xl">
-              {/* YouTube Shorts Video Integration */}
               <iframe 
                 className="w-full h-full object-cover"
                 src="https://www.youtube.com/embed/Lrk3dnCasEI?autoplay=0&controls=1&rel=0" 
@@ -143,54 +199,49 @@ export default function TateMemorial() {
         </div>
       </section>
 
-      {/* SECTION 3: PROFESSIONAL MASONRY GALLERY */}
+      {/* SECTION 3: ORGANIC MASONRY GALLERY */}
       <section id="gallery" className="max-w-[1400px] mx-auto py-32 px-6">
         <div className="flex flex-col items-center mb-20 text-center">
           <ImageIcon className="text-amber-500/40 mb-4" size={32} />
-          <h2 className="text-5xl font-serif italic text-white tracking-wide">Visual Archives</h2>
+          <h2 className="text-4xl font-serif italic text-white tracking-wide">Visual Archives</h2>
           <p className="text-stone-500 text-[10px] uppercase tracking-[0.6em] mt-6 font-light">
-            Roots of our family • Memories that guide us
+            Family legacy across generations
           </p>
         </div>
 
-        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+        <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 space-y-4">
           {galleryMedia.slice(0, displayLimit).map((item, i) => (
             <motion.div 
               key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.6 }}
               onClick={() => setSelectedIdx(i)}
-              className="relative break-inside-avoid rounded-2xl overflow-hidden cursor-pointer bg-stone-900 border border-white/5 group shadow-lg"
+              className="relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer bg-stone-900 border border-white/5 group shadow-lg"
             >
               <img 
                 src={item.url} 
-                className="w-full h-auto grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000 pointer-events-none"
+                className="w-full h-auto grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 pointer-events-none block"
                 alt={item.title}
               />
-              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/0 transition-colors duration-500" />
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="p-4 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 scale-75 group-hover:scale-100 transition-transform duration-500">
-                  <Maximize2 size={24} className="text-white" />
-                </div>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-amber-200 font-medium">{item.title}</p>
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-500" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
+                <p className="text-[9px] uppercase tracking-[0.3em] text-amber-200 font-medium">{item.title}</p>
               </div>
             </motion.div>
           ))}
         </div>
 
         {displayLimit < galleryMedia.length && (
-          <div className="mt-24 flex justify-center">
+          <div className="mt-20 flex justify-center">
             <button 
-              onClick={() => setDisplayLimit(prev => prev + 8)}
+              onClick={() => setDisplayLimit(galleryMedia.length)}
               className="group relative flex items-center gap-4 px-12 py-5 rounded-full overflow-hidden transition-all border border-white/5"
             >
               <div className="absolute inset-0 bg-white/5 group-hover:bg-white/10 transition-colors" />
               <Plus size={18} className="text-amber-500 group-hover:rotate-90 transition-transform duration-500" />
-              <span className="relative text-[11px] uppercase tracking-[0.4em] text-stone-300 font-light">See More Memories</span>
+              <span className="relative text-[11px] uppercase tracking-[0.4em] text-stone-300 font-light">Explore Full Gallery</span>
             </button>
           </div>
         )}
@@ -215,17 +266,17 @@ export default function TateMemorial() {
 
               <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-16 items-center" onClick={(e) => e.stopPropagation()}>
                 <motion.div key={selectedIdx} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="lg:col-span-8 rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex items-center justify-center bg-stone-950">
-                  <img src={galleryMedia[selectedIdx].url} className="w-full h-auto max-h-[80vh] object-contain pointer-events-none" alt="Expanded" />
+                  <img src={galleryMedia[selectedIdx].url} className="w-full h-auto max-h-[80vh] object-contain pointer-events-none" alt="Expanded View" />
                 </motion.div>
                 <div className="lg:col-span-4 space-y-8 text-left">
                   <motion.div key={`text-${selectedIdx}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                    <h3 className="text-4xl font-serif italic text-white mb-6 leading-tight">{galleryMedia[selectedIdx].title}</h3>
+                    <h3 className="text-3xl font-serif italic text-white mb-6 leading-tight">{galleryMedia[selectedIdx].title}</h3>
                     <p className="text-stone-400 leading-relaxed font-light text-base italic">{galleryMedia[selectedIdx].description}</p>
                   </motion.div>
                   <div className="pt-10 border-t border-white/5 flex flex-col gap-4">
                     <div className="flex items-center gap-3">
                       <ShieldAlert size={16} className="text-amber-500/40" />
-                      <span className="text-[10px] uppercase tracking-[0.2em] text-stone-600 tracking-widest">Digital Content Protected</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-stone-600">Digital Content Protected</span>
                     </div>
                   </div>
                 </div>
@@ -239,13 +290,11 @@ export default function TateMemorial() {
       <footer className="py-24 border-t border-white/5 text-center flex flex-col items-center gap-10">
         <div className="space-y-4">
           <div className="text-[10px] tracking-[1em] text-stone-600 uppercase">Forever In Our Hearts</div>
-          <p className="text-sm text-stone-500 font-light">
-            Made by <span className="text-stone-200 font-serif italic tracking-wide">Sabin Mugisha</span>
-          </p>
+          <p className="text-sm text-stone-500 font-light italic">"Made by Sabin Mugisha"</p>
         </div>
         <div className="flex items-center gap-4 px-8 py-3 bg-stone-900/40 rounded-full border border-white/5 opacity-50">
           <ShieldAlert size={14} className="text-amber-500" />
-          <span className="text-[9px] uppercase tracking-[0.3em] text-stone-500">Encrypted Content Shield Active</span>
+          <span className="text-[9px] uppercase tracking-[0.3em] text-stone-500">Encrypted Security Shield Active</span>
         </div>
       </footer>
     </div>
