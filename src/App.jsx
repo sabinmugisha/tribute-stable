@@ -188,7 +188,7 @@ export default function TateMemorial() {
             <div className="aspect-video rounded-[2.5rem] overflow-hidden bg-black relative group shadow-2xl">
               <iframe 
                 className="w-full h-full object-cover"
-                src="https://www.youtube.com/embed/Lrk3dnCasEI?autoplay=0&controls=1&rel=0" 
+                src="" 
                 title="Tate Memorial Tribute"
                 frameBorder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
