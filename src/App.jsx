@@ -4,7 +4,7 @@ import Navbar from './components/navbar';
 import Footer from './components/footer';
 import Home from './pages/home';
 import Gallery from './pages/gallery';
-import Guestbook from './pages/Guestbook';
+import Guestbook from './pages/guestbook';
 
 
 export default function App() {
