@@ -45,7 +45,7 @@ export default function Navbar() {
           <motion.span 
             className="text-amber-500/90 font-serif italic tracking-[0.4em] text-sm md:text-base block"
           >
-            M. ANASTASIE
+            Memorial
           </motion.span>
           <div className="absolute bottom-0 left-0 w-full h-[1px] bg-amber-500/40 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500" />
         </Link>
