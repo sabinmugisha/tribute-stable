@@ -1,0 +1,20 @@
+[build]
+  # The command to run to build your site
+  command = "npm run build"
+  
+  # The directory that contains the deploy-ready HTML/assets
+  # Vite defaults to "dist"
+  publish = "dist"
+
+[build.environment]
+  # Ensures Netlify uses a modern Node version compatible with Vite 7
+  NODE_VERSION = "20"
+  # Ensures npm doesn't get stuck on permission prompts
+  NPM_FLAGS = "--no-audit"
+
+[[redirects]]
+  # This is crucial for React Router (Single Page Apps)
+  # It prevents 404 errors when you refresh the page
+  from = "/*"
+  to = "/index.html"
+  status = 200
