@@ -5,6 +5,7 @@ import Footer from './components/footer';
 import Home from './pages/home';
 import Gallery from './pages/gallery';
 import Guestbook from './pages/guestbook';
+import Admin from './pages/admin'
 
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/guestbook" element={<Guestbook />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
         <Footer />
       </div>
