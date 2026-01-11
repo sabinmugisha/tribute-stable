@@ -125,7 +125,7 @@ export default function Guestbook() {
               />
             </div>
             <textarea 
-              rows="4" placeholder="What is a memory that makes you smile?" value={formData.message}
+              rows="4" placeholder="Share a favorite moment you shared with her" value={formData.message}
               onChange={(e) => setFormData({...formData, message: e.target.value})}
               className="w-full bg-white/5 border border-white/10 rounded-[2rem] px-6 py-4 outline-none focus:border-amber-500/50 resize-none" required
             />
